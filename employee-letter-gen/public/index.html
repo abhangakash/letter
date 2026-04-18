@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Increment Letter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo h1 { font-size: 22px; color: #1a1a2e; font-weight: 700; }
+    .logo p { font-size: 12px; color: #888; margin-top: 4px; }
+
+    .divider { height: 2px; background: linear-gradient(90deg, #1a1a2e, #0f3460); border-radius: 2px; margin-bottom: 28px; }
+
+    label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus { border-color: #1a1a2e; }
+
+    button {
+      padding: 12px 22px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: #0f3460; }
+    button:disabled { background: #aaa; cursor: not-allowed; }
+
+    #error { color: #e53935; font-size: 13px; margin-top: 8px; display: none; }
+
+    /* Result Card */
+    #result {
+      margin-top: 28px;
+      background: #f7f9ff;
+      border: 1px solid #d0d8f0;
+      border-radius: 12px;
+      padding: 24px;
+      display: none;
+    }
+
+    #result h2 {
+      font-size: 16px;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .detail-item label { font-size: 11px; color: #888; margin-bottom: 2px; }
+    .detail-item span { font-size: 13px; color: #1a1a2e; font-weight: 600; }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #1a1a2e, #0f3460);
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .highlight-box .inc { font-size: 28px; font-weight: 700; color: #4fc3f7; }
+    .highlight-box .inc-label { font-size: 11px; opacity: 0.7; }
+    .highlight-box .salary { text-align: right; }
+    .highlight-box .salary span { font-size: 18px; font-weight: 700; display: block; }
+    .highlight-box .salary small { font-size: 11px; opacity: 0.7; }
+
+    #downloadBtn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1a1a2e, #0f3460);
+      border-radius: 8px;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #downloadBtn:hover { opacity: 0.9; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <h1>🏢 TechCorp India</h1>
+      <p>Employee Increment Letter Portal</p>
+    </div>
+    <div class="divider"></div>
+
+    <label for="empIdInput">Enter Employee ID</label>
+    <div class="input-row">
+      <input type="text" id="empIdInput" placeholder="e.g. EMP001" maxlength="10" />
+      <button id="searchBtn" onclick="searchEmployee()">Search</button>
+    </div>
+    <div id="error"></div>
+
+    <div id="result">
+      <h2>Employee Details <span class="badge" id="empTypeBadge"></span></h2>
+
+      <div class="detail-grid">
+        <div class="detail-item"><label>Full Name</label><span id="r-name"></span></div>
+        <div class="detail-item"><label>Employee ID</label><span id="r-empid"></span></div>
+        <div class="detail-item"><label>Job Role</label><span id="r-role"></span></div>
+        <div class="detail-item"><label>Department</label><span id="r-dept"></span></div>
+        <div class="detail-item"><label>Date of Joining</label><span id="r-doj"></span></div>
+        <div class="detail-item"><label>Reporting Manager</label><span id="r-manager"></span></div>
+        <div class="detail-item"><label>Location</label><span id="r-loc"></span></div>
+        <div class="detail-item"><label>Effective From</label><span id="r-eff"></span></div>
+      </div>
+
+      <div class="highlight-box">
+        <div>
+          <div class="inc-label">INCREMENT</div>
+          <div class="inc" id="r-inc"></div>
+        </div>
+        <div class="salary">
+          <small>New Annual CTC</small>
+          <span id="r-newsal"></span>
+        </div>
+      </div>
+
+      <button id="downloadBtn" onclick="downloadLetter()">
+        <span id="dlSpinner" class="spinner"></span>
+        ⬇ Download Increment Letter (PDF)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let currentEmpId = '';
+
+    const fmt = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    const fmtMoney = (n) => '₹ ' + Number(n).toLocaleString('en-IN');
+
+    async function searchEmployee() {
+      const empId = document.getElementById('empIdInput').value.trim().toUpperCase();
+      const errEl = document.getElementById('error');
+      const btn = document.getElementById('searchBtn');
+
+      errEl.style.display = 'none';
+      document.getElementById('result').style.display = 'none';
+
+      if (!empId) { showError('Please enter an Employee ID'); return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Searching...';
+
+      try {
+        const res = await fetch(`/api/employee/search?emp_id=${empId}`);
+        const data = await res.json();
+
+        if (!res.ok) { showError(data.error || 'Employee not found'); return; }
+
+        currentEmpId = data.emp_id;
+
+        document.getElementById('r-name').textContent = data.name;
+        document.getElementById('r-empid').textContent = data.emp_id;
+        document.getElementById('r-role').textContent = data.job_role;
+        document.getElementById('r-dept').textContent = data.department;
+        document.getElementById('r-doj').textContent = fmt(data.date_of_joining);
+        document.getElementById('r-manager').textContent = data.manager_name;
+        document.getElementById('r-loc').textContent = data.location;
+        document.getElementById('r-eff').textContent = fmt(data.effective_date);
+        document.getElementById('r-inc').textContent = data.increment_percentage + '%';
+        document.getElementById('r-newsal').textContent = fmtMoney(data.new_salary);
+        document.getElementById('empTypeBadge').textContent = data.employee_type;
+
+        document.getElementById('result').style.display = 'block';
+      } catch (e) {
+        showError('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Search';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    async function downloadLetter() {
+      if (!currentEmpId) return;
+      const spinner = document.getElementById('dlSpinner');
+      const btn = document.getElementById('downloadBtn');
+      spinner.style.display = 'block';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/employee/letter/${currentEmpId}`);
+        if (!res.ok) { alert('Failed to generate letter'); return; }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Increment_Letter_${currentEmpId}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert('Download failed. Please try again.');
+      } finally {
+        spinner.style.display = 'none';
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('empIdInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') searchEmployee();
+    });
+  </script>
+</body>
+</html>
